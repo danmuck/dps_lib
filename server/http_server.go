@@ -1,0 +1,88 @@
+package server
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"time"
+
+	"github.com/danmuck/dps_lib/logs"
+	"github.com/danmuck/dps_lib/mongo_client"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+)
+
+func init() {
+	// tries to load .env, but won’t crash if it’s missing
+	if err := godotenv.Load(); err != nil {
+		logs.Info("Warning: no .env file found, relying on environment variables")
+	}
+}
+
+type HTTPServer struct {
+	Version  string
+	Domain   string
+	Port     string
+	ClientIP string // ClientIP is the IP address of the client making the request
+
+	Mongo  *mongo_client.MongoClient
+	router *gin.Engine
+}
+
+func (s *HTTPServer) Start() error {
+	address := s.Domain + ":" + s.Port
+	logs.Info("Starting HTTP server on %s", address)
+
+	return s.router.Run(address)
+}
+
+func (s *HTTPServer) Stop() error {
+	logs.Info("Stopping HTTP server on %s", s.Domain+":"+s.Port)
+	if err := s.Mongo.Client().Disconnect(context.Background()); err != nil {
+		logs.Err("Failed to disconnect from MongoDB: %v", err)
+		return err
+	}
+	return nil
+}
+
+func (s *HTTPServer) Router() *gin.RouterGroup {
+	rootPath := fmt.Sprintf("api/v%s", s.Version)
+	rg := s.router.Group(rootPath)
+	return rg
+}
+
+func NewHTTPServer() *HTTPServer {
+	mongo, err := mongo_client.NewMongoStore(
+		os.Getenv("MONGO_URI"), // Replace with your MongoDB URI
+		os.Getenv("MONGO_DB"),  // Database name for user storage
+	)
+	if err != nil {
+		logs.Fatal("Failed to connect to MongoDB: %v", err)
+	}
+	router := gin.Default()
+	router.SetTrustedProxies([]string{os.Getenv("DOMAIN")})
+	router.Use(gin.Logger(), gin.Recovery())
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{os.Getenv("CLIENT_IP")},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+	router.Use(func(c *gin.Context) {
+		logs.Dev("Incoming request: %s %s (origin: %s)", c.Request.Method, c.Request.URL.Path, c.Request.Header.Get("Origin"))
+		c.Next()
+	})
+
+	return &HTTPServer{
+		Version:  os.Getenv("VERSION"),
+		Domain:   os.Getenv("DOMAIN"),
+		Port:     os.Getenv("PORT"),
+		ClientIP: os.Getenv("CLIENT_IP"),
+
+		Mongo:  mongo,
+		router: router,
+	}
+}
