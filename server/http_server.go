@@ -18,6 +18,29 @@ func init() {
 	if err := godotenv.Load(); err != nil {
 		logs.Info("Warning: no .env file found, relying on environment variables")
 	}
+
+	if os.Getenv("MONGO_URI") == "" {
+		logs.Fatal("MONGO_URI environment variable must be set")
+	}
+	if os.Getenv("MONGO_DB") == "" {
+		logs.Fatal(" MONGO_DB environment variable must be set")
+	}
+	if os.Getenv("VERSION") == "" {
+		logs.Fatal("VERSION environment variable must be set")
+	}
+	if os.Getenv("DOMAIN") == "" {
+		logs.Fatal("DOMAIN environment variable must be set")
+	}
+	if os.Getenv("PORT") == "" {
+		logs.Fatal("PORT environment variable must be set")
+	}
+	if os.Getenv("CLIENT_IP") == "" {
+		logs.Fatal("CLIENT_IP environment variable must be set")
+	}
+	logs.Info("Environment variables loaded successfully")
+	logs.Dev("[DEV]> .env > \n %s \n %s \n %s \n %s \n %s \n %s",
+		os.Getenv("VERSION"), os.Getenv("MONGO_URI"), os.Getenv("MONGO_DB"),
+		os.Getenv("DOMAIN"), os.Getenv("PORT"), os.Getenv("CLIENT_IP"))
 }
 
 type HTTPServer struct {
