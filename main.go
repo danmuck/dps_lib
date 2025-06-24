@@ -5,6 +5,7 @@ import (
 
 	"github.com/danmuck/dps_lib/logs"
 	"github.com/danmuck/dps_lib/mongo_client"
+	"github.com/danmuck/dps_lib/server"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -39,5 +40,11 @@ func init() {
 
 func main() {
 	logs.Dev("test")
-
+	s := server.NewHTTPServer()
+	logs.Dev("Starting server with configuration: %+v", s)
+	err := s.Start()
+	if err != nil {
+		logs.Err("Error starting server: %v", err)
+		return
+	}
 }

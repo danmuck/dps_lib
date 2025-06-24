@@ -54,9 +54,8 @@ type HTTPServer struct {
 }
 
 func (s *HTTPServer) Start() error {
-	address := s.Domain + ":" + s.Port
+	address := ":" + s.Port
 	logs.Info("Starting HTTP server on %s", address)
-
 	return s.router.Run(address)
 }
 
