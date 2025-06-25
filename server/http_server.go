@@ -87,14 +87,14 @@ func NewHTTPServer() *HTTPServer {
 	}
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://127.0.0.1:8080", "http://localhost:8080", "http://127.0.0.1:3031", os.Getenv("CLIENT") + ":" + os.Getenv("CLIENT_PORT")},
+		AllowOrigins:     []string{"http://localhost:3031", os.Getenv("CLIENT") + ":" + os.Getenv("CLIENT_PORT")},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-	router.SetTrustedProxies([]string{os.Getenv("CLIENT")})
+	// router.SetTrustedProxies([]string{os.Getenv("CLIENT")})
 	router.Use(gin.Logger(), gin.Recovery())
 	router.Use(func(c *gin.Context) {
 		logs.Dev("Incoming request: %s %s (origin: %s)", c.Request.Method, c.Request.URL.Path, c.Request.Header.Get("Origin"))
