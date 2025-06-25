@@ -34,8 +34,11 @@ func init() {
 	if os.Getenv("PORT") == "" {
 		logs.Fatal("PORT environment variable must be set")
 	}
-	if os.Getenv("CLIENT_IP") == "" {
-		logs.Fatal("CLIENT_IP environment variable must be set")
+	if os.Getenv("CLIENT") == "" {
+		logs.Fatal("CLIENT environment variable must be set")
+	}
+	if os.Getenv("CLIENT_PORT") == "" {
+		logs.Fatal("CLIENT_PORT environment variable must be set")
 	}
 	logs.Info("Environment variables loaded successfully")
 	logs.Dev("[DEV]> .env > \n %s \n %s \n %s \n %s \n %s \n %s",
