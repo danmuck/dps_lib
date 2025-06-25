@@ -89,7 +89,7 @@ func NewHTTPServer() *HTTPServer {
 	router.SetTrustedProxies([]string{os.Getenv("CLIENT")})
 	router.Use(gin.Logger(), gin.Recovery())
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{os.Getenv("CLIENT") + ":" + os.Getenv("CLIENT_PORT"), "http://localhost"},
+		AllowOrigins:     []string{"http://localhost:3031", os.Getenv("CLIENT") + ":" + os.Getenv("CLIENT_PORT")},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
