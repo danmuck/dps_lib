@@ -12,12 +12,12 @@ import (
 
 func verifyUsername(username string) bool {
 	err := TMP_STORAGE.Collection("users").FindOne(context.Background(), bson.M{"username": username}).Decode(nil)
-	return err == mongo.ErrNoDocuments
+	return err != mongo.ErrNoDocuments
 }
 
 func verifyEmail(email string) bool {
 	err := TMP_STORAGE.Collection("users").FindOne(context.Background(), bson.M{"email": email}).Decode(nil)
-	return err == mongo.ErrNoDocuments
+	return err != mongo.ErrNoDocuments
 }
 
 func verifyNew(username, email string) bool {
