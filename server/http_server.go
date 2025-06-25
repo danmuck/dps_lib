@@ -83,10 +83,10 @@ func NewHTTPServer() *HTTPServer {
 		logs.Fatal("Failed to connect to MongoDB: %v", err)
 	}
 	router := gin.Default()
-	router.SetTrustedProxies([]string{os.Getenv("DOMAIN")})
+	router.SetTrustedProxies([]string{os.Getenv("CLIENT")})
 	router.Use(gin.Logger(), gin.Recovery())
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{os.Getenv("CLIENT_IP")},
+		AllowOrigins:     []string{os.Getenv("CLIENT")},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -102,7 +102,7 @@ func NewHTTPServer() *HTTPServer {
 		Version:  os.Getenv("VERSION"),
 		Domain:   os.Getenv("DOMAIN"),
 		Port:     os.Getenv("PORT"),
-		ClientIP: os.Getenv("CLIENT_IP"),
+		ClientIP: os.Getenv("CLIENT") + ":" + os.Getenv("CLIENT_PORT"),
 
 		Mongo:  mongo,
 		router: router,
