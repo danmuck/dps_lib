@@ -15,7 +15,7 @@ const (
 	ERROR           // Verbosity Production
 )
 
-const MODE = WARN   // Set the logging mode, e.g., DEV, ERROR, WARN, DEBUG
+const MODE = DEBUG  // Set the logging mode, e.g., DEV, ERROR, WARN, DEBUG
 const TRACE = false // Enable/disable stack trace logging
 var (
 	LOGGER_filter           = []string{"api:users"}
